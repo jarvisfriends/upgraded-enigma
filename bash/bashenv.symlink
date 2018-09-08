@@ -1,0 +1,12 @@
+#set my umask depending on whether it looks like I own my group.
+
+if [ "$(id -un)" = "$(id -gn)" ]
+   then umask 027
+   else umask 077
+      fi
+
+# Load any site-specific commands that I have defined.
+
+if [ -f "$HOME/.localrc" ]
+   then source "$HOME/.localrc"
+fi

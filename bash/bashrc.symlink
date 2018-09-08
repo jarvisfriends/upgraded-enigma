@@ -1,0 +1,63 @@
+source ~/.git-prompt.sh
+source ~/.git-completion.bash
+source ~/.bash_aliases.sh
+source ~/.bash_prompt.sh
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+PATH=$HOME/bin:$HOME/usr/local/bin
+fi
+
+#if [ -d "/home/advtech1/mreid/usr/local/bin" ] ; then
+#PATH=$PATH:/home/advtech1/mreid/usr/local/bin
+#fi
+
+export TERM=xterm
+export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/rti_connext_dds-5.2.0/bin
+
+if [ -d "/project/common/global/klocwork/scripts" ]; then
+   export PATH=$PATH:/project/common/global/klocwork/scripts
+fi
+
+# An excellent pager is of the utmost importance to the Unix experience.
+
+export LESS="-i -j.49 -M -R -z-2"
+export PAGER=less
+
+# fix the weird window sizing behavior. 
+# Bash should update the LINES and COLUMNS environment variables each
+# time the terminal window gets resized, for programs that care.
+if [ -n "$BASH" ]
+   then shopt -s checkwinsize
+fi
+
+#create neither *.pyc files nor __pycache__ directories.
+export PYTHONDONTWRITEBYTECODE=PLEASE
+
+alias gi="g -i"
+alias la="/bin/ls --color -ahvCF"
+alias lf="/bin/ls --color -vhCF"
+alias ll="/bin/ls --color -lhv"
+alias lla="/bin/ls --color -ahlv"
+alias ltr="/bin/ls --color -lthr"
+alias ltra="/bin/ls --color -lthra"
+alias m="less"
+alias s="ssh"
+d () {
+       if [ -t 1 ]
+          then $DIFF -ur "$@" 2>&1 | less
+       else $DIFF -ur "$@"
+      fi
+}
+
+wd() {
+       diff -u "$@" | wdiff -d -n -w $'\033[1;31;47m' -x $'\033[0m' \
+                                      -y $'\033[1;32;47m' -z $'\033[0m'
+}
+
+utf8()
+{
+   iconv -f ISO-8859-1 -t UTF-8 $1 > $1.tmp
+      rm $1
+      mv $1.tmp $1
+}

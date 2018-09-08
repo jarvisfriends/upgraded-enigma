@@ -1,0 +1,63 @@
+[user]
+	name = Michael Reid
+	email = pershing2.crr@gmail.com
+
+[alias]
+	a = add -A .
+	abandon = !b=$(git symbolic-ref --short HEAD) && [ $b != master ] && git checkout master && git branch -D $b
+	amend = commit --amend
+	atag = !bash -c 'git tag -a \"$1\" && git push --follow-tags' --
+	br = branch
+	ci = commit -v
+	co = checkout
+	d = diff
+	diff-vs-master = !git diff $(git merge-base HEAD origin/master) -- .
+	incoming = remote show origin
+	l = log --graph --pretty=oneline --abbrev-commit --decorate=short
+	lp = log -p
+	ls = log --stat
+	locate = ls-tree --name-only -r HEAD
+	score = diff --shortstat
+	st = status -s
+	undo = reset --soft HEAD~1
+	g = log --graph --all --pretty=format:'%C(red)%h%Creset%C(bold red)%d%Creset %s%Cgreen (%cr) %C(blue)<%an>%Creset' --abbrev-commit
+	gs = log --show-signature --graph --all --pretty=format:'%C(red)%h%Creset%C(bold yellow)%d%Creset %s%Cgreen (%cr) %C(blue)<%an>%Creset' --abbrev-commit
+	graphviz = "!f() { echo 'digraph git {' ; git log --pretty='format:  %h -> { %p }' \"$@\" | sed 's/[0-9a-f][0-9a-f]*/\"&\"/g' ; echo '}'; }; f"
+	dt = difftool
+	sh = !git-sh
+	permission-reset = !git diff -p -R | grep -E \"^(diff|(old|new) mode)\" | git apply
+
+[core]
+	pager = less -FRX
+	excludesfile = ~/.gitexcludes
+
+[color]
+	branch = auto
+	diff = auto
+	interactive = auto
+	status = auto
+
+[status]
+ showuntrackedfiles = no
+
+[commit]
+ template = ~/.gitmessage.txt
+
+[filter "sshconfig_trailer"]
+ clean = sed '/^. Everything below will be ignored by git.$/q'
+
+[merge]
+ conflictstyle = diff3
+
+[difftool]
+ prompt = false
+ tool = tkdiff
+
+[push]
+ default = current
+
+[branch]
+ autosetupmerge = always
+
+[include]
+ path = .gitlocal

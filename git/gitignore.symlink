@@ -1,0 +1,21 @@
+.*.ko.cmd
+.*.mod.o.cmd
+.*.o.cmd
+*pciedriver*.ko.unsigned*
+.tmp_versions/*.mod
+Module.symvers
+Module.markers
+*.ko
+*.mod.c
+*.mod.o
+*.o
+*.o.d
+*.swp
+*.*~
+modules.order
+#eclipse files
+.project
+.cproject
+.settings/*
+artifacts/
+build/

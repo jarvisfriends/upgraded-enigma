@@ -1,0 +1,156 @@
+#!/bin/bash
+
+set -e
+
+sudo apt-get update
+
+# Install happy packages.
+
+sudo apt-get install -y \
+    apache2-utils    `: provides 12 commands, especially "ab"` \
+    apt-file         `: to find where files come from` \
+    autocutsel       `: unifies the X Windows clipboard and selection` \
+    cabextract       `: for extracting binary Windows drivers ` \
+    chromium-browser `: browser-of-choice` \
+    chromium-chromedriver `: and make it scriptable` \
+    colordiff wdiff  `: for the occasional need to diff outside of git ` \
+    cscope           `: for that rare trawl through code ` \
+    emacs24          `: editor-of-choice` \
+    emacs24-el       `: readable LISP source` \
+    enscript         `: turn text into PostScript` \
+    fvwm             `: window manager` \
+    fonts-inconsolata `: favorite console font` \
+    fonts-sil-gentium `: font for presentation slides` \
+    git gitk         `: distributed version control` \
+    gnucash          `: accounting` \
+    gnumeric         `: spreadsheet` \
+    groff            `: for processing old documents` \
+    gscan2pdf pdftk  `: scanning to PDF` \
+    html2text        `: when data is available in no better format` \
+    indicator-cpufreq `: for pegging the CPU speed when I need to` \
+    inkscape         `: SVG editing` \
+    inotify-tools    `: for waiting on files to change` \
+    libreadline-dev  `: for compiling Python from source` \
+    libreoffice-writer `: for the occasional Microsoft Word file ` \
+    jq               `: like grep but for JSON` \
+    mosh             `: like SSH but that can survive poor hotel Wifi` \
+    mplayer2 geeqie  `: for media` \
+    openssh-server   `: for when I run scp on another machine` \
+    pandoc           `: requirement of nbconvert for the IPython notebook` \
+    pcregrep         `: reasonable RE syntax, and can capture groups` \
+    pwgen            `: random passwords` \
+    python-dev       `: necessity` \
+    pypy pypy-dev    `: for when I want to be fast` \
+    python3 python3-dev `: for when I feel modern` \
+    idle-python2.7   `: for showing IDLE and turtle to newcomers` \
+    libssl-dev       `: for compiling things that need cryptography` \
+    nmap             `: for finding the IP address that my printer lives at` \
+    rdesktop         `: for accessing Windows machines in the cloud` \
+    redshift         `: for coding past sunset` \
+    s3cmd            `: the cloud` \
+    stellarium       `: to quickly answer what-is-that-over-there questions` \
+    sqlite3          `: for command line access to its databases` \
+    swig             `: for occasional ancient Python dependencies` \
+    subversion       `: for outdated projects` \
+    texlive-latex-recommended `: for building PDF documentation with Sphinx` \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    tmux             `: to leave things running in a tty overnight` \
+    tree             `: for when ls is simply not enough` \
+    ttf-mscorefonts-installer `: for browsing the web` \
+    units            `: desk calculator` \
+    virtualbox       `: for various virtualization tasks` \
+    whois            `: for searching the domain name registries` \
+    wireshark        `: primarily for debugging TCP` \
+    xautolock        `: to lock my screen` \
+    xchat            `: IRC for software support` \
+    xserver-xephyr   `: confine apps to a recursive X server in a window` \
+    zsh              `: favorite shell` \
+    \
+    `: Mount remote filesystems` \
+    bindfs encfs smbnetfs sshfs \
+    \
+    `: for building tools like ag and ledger` \
+    automake libpcre3-dev \
+    \
+    `: for gevent` \
+    libevent1-dev \
+    \
+    `: for ledger` \
+    cmake libboost-all-dev libgmp-dev libmpfr-dev \
+    \
+    `: further tools for web development` \
+    yui-compressor \
+    \
+    `: Hettinger reminded me how awesome these tools are` \
+    graphviz python-blockdiag python-seqdiag python-actdiag python-nwdiag
+
+# Run "apt-file update" for the first time if necessary.
+
+if ! ls /var/cache/apt/apt-file | grep -q .
+then
+    sudo apt-file update
+fi
+
+# Docker
+
+#sudo apt-get install linux-image-extra-`uname -r`
+#sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
+
+#sudo sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
+#sudo chmod a+r /etc/apt/sources.list.d/docker.list
+#sudo aptitude install lxc-docker
+#sudo docker pull ubuntu
+#sudo adduser brandon docker
+
+# Shut down the oneconf service to avoid various error messages.
+
+sudo chmod a-x /usr/share/oneconf/oneconf-service
+sudo chmod a-x /usr/share/oneconf/oneconf-query
+sudo chmod a-x /usr/share/oneconf/oneconf-update
+sudo killall -q oneconf-service || true
+
+# Outlaw Ubuntu's terrible "Sorry the application X has stopped
+# unexpectedly" popups.
+
+sudo apt-get purge -y apport apport-gtk apport-symptoms python3-apport \
+    whoopsie
+
+# A desktop session that simply runs my .xinitrc like in the old days.
+
+sudo dd of=/usr/share/xsessions/xinitrc.desktop <<EOF
+[Desktop Entry]
+Name=xinitrc
+Comment=Run your .xinitrc file
+Exec=/bin/bash $HOME/.xinitrc
+Type=Application
+EOF
+
+# Give normal users permission to "hibernate" because suspending on my
+# ThinkPad T430, upon resuming, results in a password dialog followed by
+# a blank display that cannot be reactivated, even with "xrandr" running
+# from a virtual terminal.  And this is true whether NVIDIA graphics or
+# the plain integrated graphics is selected in the BIOS.
+#
+# http://askubuntu.com/questions/1792/how-can-i-suspend-hibernate-from-command-line/131022
+
+HIBER=/etc/polkit-1/localauthority/50-local.d/com.ubuntu.enable-hibernate.pkla
+if ! sudo ls $HIBER 2>/dev/null
+then
+    sudo dd of=$HIBER <<'EOF'
+[Re-enable hibernate by default]
+Identity=unix-user:*
+Action=org.freedesktop.upower.hibernate
+ResultActive=yes
+EOF
+fi
+
+# DF.
+
+sudo apt-get install -y libsdl-image1.2 libsdl-ttf2.0-0 libopenal1 libsndfile1
+sudo ln -sf libsndfile.so.1 /usr/lib/i386-linux-gnu/libsndfile.so || true
+sudo ln -sf libopenal.so.1 /usr/lib/i386-linux-gnu/libopenal.so || true
+
+# Cleanup.
+
+rmdir ~/Documents ~/Music ~/Pictures ~/Public ~/Templates ~/Videos || true
